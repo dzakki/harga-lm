@@ -26,6 +26,23 @@ function run({ script, output }) {
   });
 }
 
+function saveLastRun() {
+  // WITA = UTC+8
+  const now = new Date();
+  const wita = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const formatted =
+    `${wita.getUTCFullYear()}-${pad(wita.getUTCMonth() + 1)}-${pad(wita.getUTCDate())} ` +
+    `${pad(wita.getUTCHours())}:${pad(wita.getUTCMinutes())}:${pad(wita.getUTCSeconds())} WITA`;
+
+  fs.writeFileSync(
+    path.join(__dirname, 'last-run.json'),
+    JSON.stringify({ last_run: formatted }, null, 2)
+  );
+  console.log(`Last run saved: ${formatted}`);
+}
+
 (async () => {
   const results = await Promise.allSettled(SCRIPTS.map(run));
   const failed = results.filter(r => r.status === 'rejected');
@@ -33,5 +50,6 @@ function run({ script, output }) {
     console.error(`\n${failed.length} script(s) failed.`);
     process.exit(1);
   }
+  saveLastRun();
   console.log('\nAll done.');
 })();
