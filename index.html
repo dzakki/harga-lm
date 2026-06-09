@@ -116,6 +116,7 @@
 
   function renderCategory(cat, items) {
     const rows = Object.entries(items)
+      .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
       .map(([w, v]) => `
         <tr>
           <td>${w} gr</td>
