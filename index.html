@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harga Emas Hari Ini</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #b8860b;
+      color: #fff;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header p  { margin-top: 6px; font-size: 0.85rem; opacity: 0.85; }
+
+    main {
+      max-width: 960px;
+      margin: 32px auto;
+      padding: 0 16px 48px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .source-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+
+    .source-header {
+      background: #b8860b;
+      color: #fff;
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .category-block { border-top: 1px solid #f0f0f0; }
+    .category-block:first-child { border-top: none; }
+
+    .category-label {
+      padding: 10px 18px 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #888;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    th {
+      background: #fafafa;
+      padding: 8px 18px;
+      text-align: left;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 1px solid #eee;
+    }
+    td {
+      padding: 8px 18px;
+      border-bottom: 1px solid #f4f4f4;
+    }
+    tr:last-child td { border-bottom: none; }
+    td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .loading { padding: 18px; color: #888; font-size: 0.9rem; }
+    .error   { padding: 18px; color: #c0392b; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Harga Emas Hari Ini</h1>
+  <p id="last-run">Memuat data…</p>
+</header>
+
+<main id="main">
+  <p class="loading">Memuat harga emas…</p>
+</main>
+
+<script>
+  const SOURCES = [
+    { file: 'antam.json',    label: 'ANTAM' },
+    { file: 'emasku.json',   label: 'Emasku' },
+    { file: 'galery24.json', label: 'Galeri 24' },
+    { file: 'ubs.json',      label: 'UBS' },
+  ];
+
+  function toLabel(key) {
+    return key
+      .split('_')
+      .map(w => w === 'ubs' || w === 'lm' ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  }
+
+  function formatRp(val) {
+    if (!val) return '-';
+    // Already formatted (e.g. "1.434.000") — just prepend Rp
+    return 'Rp ' + val;
+  }
+
+  function renderCategory(cat, items) {
+    const rows = Object.entries(items)
+      .map(([w, v]) => `
+        <tr>
+          <td>${w} gr</td>
+          <td>${formatRp(v.harga_dasar)}</td>
+          <td>${formatRp(v.harga_final)}</td>
+        </tr>`)
+      .join('');
+
+    return `
+      <div class="category-block">
+        <div class="category-label">${toLabel(cat)}</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Berat</th>
+              <th>Harga Dasar</th>
+              <th>Harga Final</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderSource(label, data) {
+    const categories = Object.entries(data)
+      .map(([cat, items]) => renderCategory(cat, items))
+      .join('');
+
+    return `
+      <div class="source-card">
+        <div class="source-header">${label}</div>
+        ${categories}
+      </div>`;
+  }
+
+  async function loadAll() {
+    const main = document.getElementById('main');
+    const lastRunEl = document.getElementById('last-run');
+
+    try {
+      const res = await fetch('last-run.json');
+      if (res.ok) {
+        const { last_run } = await res.json();
+        lastRunEl.textContent = 'Diperbarui: ' + last_run;
+      }
+    } catch (_) {}
+
+    const cards = await Promise.all(
+      SOURCES.map(async ({ file, label }) => {
+        try {
+          const res = await fetch(file);
+          if (!res.ok) throw new Error(res.status);
+          const data = await res.json();
+          return renderSource(label, data);
+        } catch (e) {
+          return `<div class="source-card">
+            <div class="source-header">${label}</div>
+            <p class="error">Gagal memuat data (${e.message})</p>
+          </div>`;
+        }
+      })
+    );
+
+    main.innerHTML = cards.join('');
+  }
+
+  loadAll();
+</script>
+</body>
+</html>

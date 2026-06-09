@@ -3,6 +3,11 @@ name: Scrape Gold Prices
 on:
   workflow_dispatch:        # manual trigger from GitHub UI
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   scrape:
     runs-on: ubuntu-latest
@@ -30,3 +35,29 @@ jobs:
           git add antam.json emasku.json galery24.json ubs.json last-run.json
           git diff --cached --quiet || git commit -m "chore: update gold prices $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
+
+  deploy:
+    needs: scrape
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: main          # pick up the freshly pushed JSON files
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .            # serve the whole repo root
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
