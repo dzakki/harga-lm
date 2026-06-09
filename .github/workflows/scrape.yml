@@ -1,0 +1,32 @@
+name: Scrape Gold Prices
+
+on:
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run all scrapers
+        run: node run-all.js
+
+      - name: Commit updated JSON files
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add antam.json emasku.json galery24.json ubs.json
+          git diff --cached --quiet || git commit -m "chore: update gold prices $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
