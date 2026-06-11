@@ -1,16 +1,16 @@
 {
   "lm_ubs": {
-      "0.1": {"harga_dasar":"380.800","harga_final":"380.800"},
-      "0.25": {"harga_dasar":"867.400","harga_final":"867.400"},
-      "0.5": {"harga_dasar":"1.565.600","harga_final":"1.565.600"},
-      "1": {"harga_dasar":"2.776.500","harga_final":"2.776.500"},
-      "2": {"harga_dasar":"5.483.500","harga_final":"5.483.500"},
-      "3": {"harga_dasar":"8.206.000","harga_final":"8.206.000"},
-      "4": {"harga_dasar":"10.901.200","harga_final":"10.901.200"},
-      "5": {"harga_dasar":"13.449.000","harga_final":"13.449.000"},
-      "10": {"harga_dasar":"26.663.900","harga_final":"26.663.900"},
-      "25": {"harga_dasar":"66.447.600","harga_final":"66.447.600"},
-      "50": {"harga_dasar":"132.432.300","harga_final":"132.432.300"},
-      "100": {"harga_dasar":"264.684.500","harga_final":"264.684.500"}
+      "0.1": {"harga_dasar":"370.900","harga_final":"370.900"},
+      "0.25": {"harga_dasar":"845.000","harga_final":"845.000"},
+      "0.5": {"harga_dasar":"1.525.100","harga_final":"1.525.100"},
+      "1": {"harga_dasar":"2.704.700","harga_final":"2.704.700"},
+      "2": {"harga_dasar":"5.341.700","harga_final":"5.341.700"},
+      "3": {"harga_dasar":"7.993.800","harga_final":"7.993.800"},
+      "4": {"harga_dasar":"10.619.200","harga_final":"10.619.200"},
+      "5": {"harga_dasar":"13.101.200","harga_final":"13.101.200"},
+      "10": {"harga_dasar":"25.974.400","harga_final":"25.974.400"},
+      "25": {"harga_dasar":"64.729.200","harga_final":"64.729.200"},
+      "50": {"harga_dasar":"129.007.500","harga_final":"129.007.500"},
+      "100": {"harga_dasar":"257.839.700","harga_final":"257.839.700"}
   }
 }
