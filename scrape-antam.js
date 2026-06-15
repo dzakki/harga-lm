@@ -13,8 +13,8 @@ async function scrapeHargaEmas() {
   );
 
   try {
-    await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 60000 });
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 20000 });
+    await page.goto(TARGET_URL, { waitUntil: 'load', timeout: 180000 });
+    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
 
     // Open the location modal (Fancybox AJAX popup)
     await page.evaluate(() => {
@@ -24,15 +24,15 @@ async function scrapeHargaEmas() {
       if (link) link.click();
     });
 
-    await page.waitForSelector('#location', { timeout: 20000 });
+    await page.waitForSelector('#location', { timeout: 90000 });
     await page.select('#location', DENPASAR_CODE);
 
     await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
+      page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }),
       page.evaluate(() => document.getElementById('change-location').submit()),
     ]);
 
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 20000 });
+    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
 
     const html = await page.content();
     return parseTable(html);
