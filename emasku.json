@@ -1,26 +1,26 @@
 {
   "gold": {
-      "0.1": {"harga_dasar":"330.000","harga_final":"330.000"},
-      "0.25": {"harga_dasar":"773.500","harga_final":"773.500"},
-      "0.5": {"harga_dasar":"1.357.500","harga_final":"1.357.500"},
-      "1": {"harga_dasar":"2.605.000","harga_final":"2.605.000"},
-      "2": {"harga_dasar":"5.170.000","harga_final":"5.170.000"},
-      "5": {"harga_dasar":"12.845.000","harga_final":"12.845.000"},
-      "10": {"harga_dasar":"25.640.000","harga_final":"25.640.000"},
-      "25": {"harga_dasar":"63.750.000","harga_final":"63.750.000"},
-      "50": {"harga_dasar":"127.450.000","harga_final":"127.450.000"},
-      "100": {"harga_dasar":"254.800.000","harga_final":"254.800.000"},
-      "125": {"harga_dasar":"318.250.000","harga_final":"318.250.000"},
-      "150": {"harga_dasar":"381.750.000","harga_final":"381.750.000"},
-      "175": {"harga_dasar":"445.200.000","harga_final":"445.200.000"},
-      "200": {"harga_dasar":"508.600.000","harga_final":"508.600.000"},
-      "250": {"harga_dasar":"635.250.000","harga_final":"635.250.000"},
-      "500": {"harga_dasar":"1.270.500.000","harga_final":"1.270.500.000"},
-      "1000": {"harga_dasar":"2.541.000.000","harga_final":"2.541.000.000"}
+      "0.1": {"harga_dasar":"332.000","harga_final":"332.000"},
+      "0.25": {"harga_dasar":"778.500","harga_final":"778.500"},
+      "0.5": {"harga_dasar":"1.362.500","harga_final":"1.362.500"},
+      "1": {"harga_dasar":"2.615.000","harga_final":"2.615.000"},
+      "2": {"harga_dasar":"5.190.000","harga_final":"5.190.000"},
+      "5": {"harga_dasar":"12.895.000","harga_final":"12.895.000"},
+      "10": {"harga_dasar":"25.740.000","harga_final":"25.740.000"},
+      "25": {"harga_dasar":"64.000.000","harga_final":"64.000.000"},
+      "50": {"harga_dasar":"127.950.000","harga_final":"127.950.000"},
+      "100": {"harga_dasar":"255.800.000","harga_final":"255.800.000"},
+      "125": {"harga_dasar":"319.500.000","harga_final":"319.500.000"},
+      "150": {"harga_dasar":"383.250.000","harga_final":"383.250.000"},
+      "175": {"harga_dasar":"446.950.000","harga_final":"446.950.000"},
+      "200": {"harga_dasar":"510.600.000","harga_final":"510.600.000"},
+      "250": {"harga_dasar":"637.750.000","harga_final":"637.750.000"},
+      "500": {"harga_dasar":"1.275.500.000","harga_final":"1.275.500.000"},
+      "1000": {"harga_dasar":"2.551.000.000","harga_final":"2.551.000.000"}
   },
   "prime": {
-      "25": {"harga_dasar":"64.350.000","harga_final":"64.350.000"},
-      "50": {"harga_dasar":"128.700.000","harga_final":"128.700.000"},
-      "100": {"harga_dasar":"257.400.000","harga_final":"257.400.000"}
+      "25": {"harga_dasar":"64.600.000","harga_final":"64.600.000"},
+      "50": {"harga_dasar":"129.200.000","harga_final":"129.200.000"},
+      "100": {"harga_dasar":"258.400.000","harga_final":"258.400.000"}
   }
 }
