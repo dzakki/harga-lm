@@ -1,31 +1,31 @@
 {
   "emas_batangan": {
-      "0.5": {"harga_dasar":"1,416,500","harga_final":"1,420,041"},
-      "1": {"harga_dasar":"2,733,000","harga_final":"2,739,833"},
-      "2": {"harga_dasar":"5,406,000","harga_final":"5,419,515"},
-      "3": {"harga_dasar":"8,084,000","harga_final":"8,104,210"},
-      "5": {"harga_dasar":"13,440,000","harga_final":"13,473,600"},
-      "10": {"harga_dasar":"26,825,000","harga_final":"26,892,063"},
-      "25": {"harga_dasar":"66,937,000","harga_final":"67,104,343"},
-      "50": {"harga_dasar":"133,795,000","harga_final":"134,129,488"},
-      "100": {"harga_dasar":"267,512,000","harga_final":"268,180,780"},
-      "250": {"harga_dasar":"668,515,000","harga_final":"670,186,288"},
-      "500": {"harga_dasar":"1,336,820,000","harga_final":"1,340,162,050"},
-      "1000": {"harga_dasar":"2,673,600,000","harga_final":"2,680,284,000"}
+      "0.5": {"harga_dasar":"1,401,500","harga_final":"1,405,004"},
+      "1": {"harga_dasar":"2,703,000","harga_final":"2,709,758"},
+      "2": {"harga_dasar":"5,346,000","harga_final":"5,359,365"},
+      "3": {"harga_dasar":"7,994,000","harga_final":"8,013,985"},
+      "5": {"harga_dasar":"13,290,000","harga_final":"13,323,225"},
+      "10": {"harga_dasar":"26,525,000","harga_final":"26,591,313"},
+      "25": {"harga_dasar":"66,187,000","harga_final":"66,352,468"},
+      "50": {"harga_dasar":"132,295,000","harga_final":"132,625,738"},
+      "100": {"harga_dasar":"264,512,000","harga_final":"265,173,280"},
+      "250": {"harga_dasar":"661,015,000","harga_final":"662,667,538"},
+      "500": {"harga_dasar":"1,321,820,000","harga_final":"1,325,124,550"},
+      "1000": {"harga_dasar":"2,643,600,000","harga_final":"2,650,209,000"}
   },
   "emas_batangan_gift_series": {
-      "0.5": {"harga_dasar":"1,486,500","harga_final":"1,490,216"},
-      "1": {"harga_dasar":"2,883,000","harga_final":"2,890,208"}
+      "0.5": {"harga_dasar":"1,471,500","harga_final":"1,475,179"},
+      "1": {"harga_dasar":"2,853,000","harga_final":"2,860,133"}
   },
   "emas_batangan_selamat_idul_fitri": {
-      "5": {"harga_dasar":"14,413,000","harga_final":"14,449,033"}
+      "5": {"harga_dasar":"14,263,000","harga_final":"14,298,658"}
   },
   "emas_batangan_imlek": {
-      "8": {"harga_dasar":"22,718,800","harga_final":"22,775,597"},
-      "88": {"harga_dasar":"247,201,600","harga_final":"247,819,604"}
+      "8": {"harga_dasar":"22,478,800","harga_final":"22,534,997"},
+      "88": {"harga_dasar":"244,561,600","harga_final":"245,173,004"}
   },
   "emas_batangan_batik_seri_iii": {
-      "10": {"harga_dasar":"27,830,000","harga_final":"27,899,575"},
-      "20": {"harga_dasar":"54,860,000","harga_final":"54,997,150"}
+      "10": {"harga_dasar":"27,530,000","harga_final":"27,598,825"},
+      "20": {"harga_dasar":"54,260,000","harga_final":"54,395,650"}
   }
 }
