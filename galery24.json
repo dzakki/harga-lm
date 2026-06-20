@@ -1,15 +1,15 @@
 {
   "galeri_24": {
-      "0.5": {"harga_dasar":"1.418.000","harga_final":"1.418.000"},
-      "1": {"harga_dasar":"2.703.000","harga_final":"2.703.000"},
-      "2": {"harga_dasar":"5.342.000","harga_final":"5.342.000"},
-      "5": {"harga_dasar":"13.256.000","harga_final":"13.256.000"},
-      "10": {"harga_dasar":"26.441.000","harga_final":"26.441.000"},
-      "25": {"harga_dasar":"65.748.000","harga_final":"65.748.000"},
-      "50": {"harga_dasar":"131.391.000","harga_final":"131.391.000"},
-      "100": {"harga_dasar":"262.653.000","harga_final":"262.653.000"},
-      "250": {"harga_dasar":"655.019.000","harga_final":"655.019.000"},
-      "500": {"harga_dasar":"1.310.036.000","harga_final":"1.310.036.000"},
-      "1000": {"harga_dasar":"2.620.070.000","harga_final":"2.620.070.000"}
+      "0.5": {"harga_dasar":"1.392.000","harga_final":"1.392.000"},
+      "1": {"harga_dasar":"2.655.000","harga_final":"2.655.000"},
+      "2": {"harga_dasar":"5.245.000","harga_final":"5.245.000"},
+      "5": {"harga_dasar":"13.017.000","harga_final":"13.017.000"},
+      "10": {"harga_dasar":"25.964.000","harga_final":"25.964.000"},
+      "25": {"harga_dasar":"64.560.000","harga_final":"64.560.000"},
+      "50": {"harga_dasar":"129.017.000","harga_final":"129.017.000"},
+      "100": {"harga_dasar":"257.908.000","harga_final":"257.908.000"},
+      "250": {"harga_dasar":"643.185.000","harga_final":"643.185.000"},
+      "500": {"harga_dasar":"1.286.369.000","harga_final":"1.286.369.000"},
+      "1000": {"harga_dasar":"2.572.738.000","harga_final":"2.572.738.000"}
   }
 }
