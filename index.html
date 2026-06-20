@@ -122,6 +122,7 @@
           <td>${w} gr</td>
           <td>${formatRp(v.harga_dasar)}</td>
           <td>${formatRp(v.harga_final)}</td>
+          <td>${formatRp(v.harga_buyback)}</td>
         </tr>`)
       .join('');
 
@@ -134,6 +135,7 @@
               <th>Berat</th>
               <th>Harga Dasar</th>
               <th>Harga Final</th>
+              <th>Harga Buyback</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>

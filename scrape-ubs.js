@@ -1,11 +1,12 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
-const PAGES = [
+const BUY_PAGES = [
   'https://ubslifestyle.com/fine-gold/logam-mulia-ubs/',
   'https://ubslifestyle.com/fine-gold/logam-mulia-ubs/page/2/',
 ];
 
+const BUYBACK_URL = 'https://ubslifestyle.com/harga-buyback-hari-ini/';
 const CATEGORY = 'lm_ubs';
 
 async function scrapeAllPages() {
@@ -19,12 +20,20 @@ async function scrapeAllPages() {
   const entries = [];
 
   try {
-    for (const url of PAGES) {
+    for (const url of BUY_PAGES) {
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
       await page.waitForSelector('.as-producttile', { timeout: 10000 });
+      entries.push(...parsePage(await page.content()));
+    }
 
-      const html = await page.content();
-      entries.push(...parsePage(html));
+    // Scrape buyback prices
+    await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.waitForSelector('table tbody tr', { timeout: 15000 });
+    const buybackMap = parseBuybackPage(await page.content());
+
+    for (const entry of entries) {
+      const [weight, prices] = entry;
+      prices.harga_buyback = buybackMap.get(weight) || null;
     }
   } finally {
     await browser.close();
@@ -53,10 +62,33 @@ function parsePage(html) {
     const berat = match[1].replace(',', '.');
     const price = formatPrice(priceRaw);
 
-    entries.push([berat, { harga_dasar: price, harga_final: price }]);
+    entries.push([berat, { harga_dasar: price, harga_final: price, harga_buyback: null }]);
   });
 
   return entries;
+}
+
+// Returns Map<weight, buybackPrice> from the buyback page table
+function parseBuybackPage(html) {
+  const $ = cheerio.load(html);
+  const map = new Map();
+
+  $('table tbody tr').each((_, tr) => {
+    const cells = $(tr).find('td');
+    if (cells.length < 2) return;
+
+    // Weight cell may be like "0.5 gram" or "0.5 gr" or just "0.5"
+    const raw = $(cells.eq(0)).text().trim().replace(/\s*gr(?:am)?\.?/i, '').replace(',', '.').trim();
+    if (!raw || isNaN(parseFloat(raw))) return;
+
+    const priceRaw = $(cells.eq(1)).text().replace(/[^\d]/g, '');
+    if (!priceRaw) return;
+
+    const price = formatPrice(priceRaw);
+    map.set(raw, price);
+  });
+
+  return map;
 }
 
 function toJson(category, entries) {

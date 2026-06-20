@@ -44,11 +44,16 @@ function parseTable(html) {
 
       const berat = $(cols.eq(0)).text().trim();
       const hargaJual = stripRp($(cols.eq(1)).text().trim());
+      const hargaBuyback = cols.length >= 3 ? stripRp($(cols.eq(2)).text().trim()) : null;
 
       // Skip the header row (non-numeric berat)
       if (!berat || isNaN(parseFloat(berat))) return;
 
-      entries.push([berat, { harga_dasar: hargaJual, harga_final: hargaJual }]);
+      entries.push([berat, {
+        harga_dasar: hargaJual,
+        harga_final: hargaJual,
+        harga_buyback: hargaBuyback || null,
+      }]);
     });
   });
 

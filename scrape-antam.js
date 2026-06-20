@@ -1,8 +1,24 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
-const TARGET_URL = 'https://www.logammulia.com/id/harga-emas-hari-ini';
+const BUY_URL = 'https://www.logammulia.com/id/harga-emas-hari-ini';
+const BUYBACK_URL = 'https://www.logammulia.com/id/sell/gold';
 const DENPASAR_CODE = 'ADPS';
+
+async function selectLocation(page) {
+  await page.evaluate(() => {
+    const link = Array.from(document.querySelectorAll('a[data-fancybox]')).find(
+      (a) => a.getAttribute('data-src')?.includes('change-location')
+    );
+    if (link) link.click();
+  });
+  await page.waitForSelector('#location', { timeout: 90000 });
+  await page.select('#location', DENPASAR_CODE);
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }),
+    page.evaluate(() => document.getElementById('change-location').submit()),
+  ]);
+}
 
 async function scrapeHargaEmas() {
   const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
@@ -13,29 +29,30 @@ async function scrapeHargaEmas() {
   );
 
   try {
-    await page.goto(TARGET_URL, { waitUntil: 'load', timeout: 180000 });
+    // --- Buy prices ---
+    await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
     await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
-
-    // Open the location modal (Fancybox AJAX popup)
-    await page.evaluate(() => {
-      const link = Array.from(document.querySelectorAll('a[data-fancybox]')).find(
-        (a) => a.getAttribute('data-src')?.includes('change-location')
-      );
-      if (link) link.click();
-    });
-
-    await page.waitForSelector('#location', { timeout: 90000 });
-    await page.select('#location', DENPASAR_CODE);
-
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }),
-      page.evaluate(() => document.getElementById('change-location').submit()),
-    ]);
-
+    await selectLocation(page);
     await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
+    const buyHtml = await page.content();
+    const buyData = parseTable(buyHtml);
 
-    const html = await page.content();
-    return parseTable(html);
+    // --- Buyback prices ---
+    await page.goto(BUYBACK_URL, { waitUntil: 'load', timeout: 180000 });
+    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
+    try { await selectLocation(page); } catch (_) {}
+    try { await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 30000 }); } catch (_) {}
+    const buybackHtml = await page.content();
+    const buybackMap = parseBuybackTable(buybackHtml);
+
+    // Merge buyback prices into buy data (match by weight across all categories)
+    for (const [, entries] of buyData) {
+      for (const [weight, prices] of entries) {
+        prices.harga_buyback = buybackMap.get(weight) || null;
+      }
+    }
+
+    return buyData;
   } finally {
     await browser.close();
   }
@@ -47,8 +64,6 @@ function toSnakeCase(str) {
 
 function parseTable(html) {
   const $ = cheerio.load(html);
-  // Use Map to preserve insertion order for categories.
-  // Each category value is an array of [weight, prices] pairs (sorted later).
   const result = new Map();
   let currentSection = null;
 
@@ -69,15 +84,36 @@ function parseTable(html) {
     result.get(currentSection).push([berat, {
       harga_dasar: $(cells.eq(1)).text().trim(),
       harga_final: $(cells.eq(2)).text().trim(),
+      harga_buyback: null,
     }]);
   });
 
-  // Sort each category's entries by weight numerically
   for (const [, entries] of result) {
     entries.sort(([a], [b]) => parseFloat(a) - parseFloat(b));
   }
 
   return result;
+}
+
+// Returns Map<weight, buybackPrice> from the sell/buyback page
+function parseBuybackTable(html) {
+  const $ = cheerio.load(html);
+  const map = new Map();
+
+  $('table.table-bordered').first().find('tbody tr').each((_, tr) => {
+    if ($(tr).find('th[colspan]').length) return;
+
+    const cells = $(tr).find('td');
+    if (cells.length < 2) return;
+
+    const berat = $(cells.eq(0)).text().trim().replace(/\s*gr$/i, '');
+    if (!berat || isNaN(parseFloat(berat))) return;
+
+    const price = $(cells.eq(1)).text().trim();
+    if (price) map.set(berat, price);
+  });
+
+  return map;
 }
 
 function toJson(data) {

@@ -55,10 +55,12 @@ function parseTable(html) {
     // Weight cell: "0.1 gr" — strip the " gr" suffix
     const berat = $(cells.eq(0)).text().trim().replace(/\s*gr$/i, '').trim();
     const hargaDasar = parsePrice($(cells.eq(1)).text());
+    const hargaBuyback = cells.length >= 3 ? parsePrice($(cells.eq(2)).text()) : null;
 
     result.get(currentSection).push([berat, {
       harga_dasar: hargaDasar,
       harga_final: hargaDasar,
+      harga_buyback: hargaBuyback || null,
     }]);
   });
 
