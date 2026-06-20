@@ -69,23 +69,22 @@ function parsePage(html) {
 }
 
 // Returns Map<weight, buybackPrice> from the buyback page table
+// Table columns: Pecahan | Harga Beli | Harga Jual (Buyback)
 function parseBuybackPage(html) {
   const $ = cheerio.load(html);
   const map = new Map();
 
-  $('table tbody tr').each((_, tr) => {
+  $('table tr').each((_, tr) => {
     const cells = $(tr).find('td');
-    if (cells.length < 2) return;
+    if (cells.length < 3) return;
 
-    // Weight cell may be like "0.5 gram" or "0.5 gr" or just "0.5"
     const raw = $(cells.eq(0)).text().trim().replace(/\s*gr(?:am)?\.?/i, '').replace(',', '.').trim();
     if (!raw || isNaN(parseFloat(raw))) return;
 
-    const priceRaw = $(cells.eq(1)).text().replace(/[^\d]/g, '');
+    const priceRaw = $(cells.eq(2)).text().replace(/[^\d]/g, '');
     if (!priceRaw) return;
 
-    const price = formatPrice(priceRaw);
-    map.set(raw, price);
+    map.set(raw, formatPrice(priceRaw));
   });
 
   return map;

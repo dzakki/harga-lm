@@ -38,17 +38,24 @@ async function scrapeHargaEmas() {
     const buyData = parseTable(buyHtml);
 
     // --- Buyback prices ---
-    await page.goto(BUYBACK_URL, { waitUntil: 'load', timeout: 180000 });
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
-    try { await selectLocation(page); } catch (_) {}
-    try { await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 30000 }); } catch (_) {}
-    const buybackHtml = await page.content();
-    const buybackMap = parseBuybackTable(buybackHtml);
+    // logammulia.com/id/sell/gold shows a single per-gram rate that applies to all denominations
+    let pricePerGram = null;
+    try {
+      await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
+      await page.waitForSelector('#valBasePrice', { timeout: 30000 });
+      pricePerGram = await page.$eval('#valBasePrice', el => parseFloat(el.value));
+      process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
+    } catch (e) {
+      process.stderr.write(`[antam] buyback scrape skipped: ${e.message}\n`);
+    }
 
-    // Merge buyback prices into buy data (match by weight across all categories)
+    // Multiply per-gram rate by weight for each entry across all categories
     for (const [, entries] of buyData) {
       for (const [weight, prices] of entries) {
-        prices.harga_buyback = buybackMap.get(weight) || null;
+        if (pricePerGram !== null) {
+          const total = pricePerGram * parseFloat(weight);
+          prices.harga_buyback = Math.round(total).toLocaleString('id-ID');
+        }
       }
     }
 
@@ -95,26 +102,6 @@ function parseTable(html) {
   return result;
 }
 
-// Returns Map<weight, buybackPrice> from the sell/buyback page
-function parseBuybackTable(html) {
-  const $ = cheerio.load(html);
-  const map = new Map();
-
-  $('table.table-bordered').first().find('tbody tr').each((_, tr) => {
-    if ($(tr).find('th[colspan]').length) return;
-
-    const cells = $(tr).find('td');
-    if (cells.length < 2) return;
-
-    const berat = $(cells.eq(0)).text().trim().replace(/\s*gr$/i, '');
-    if (!berat || isNaN(parseFloat(berat))) return;
-
-    const price = $(cells.eq(1)).text().trim();
-    if (price) map.set(berat, price);
-  });
-
-  return map;
-}
 
 function toJson(data) {
   // data is a Map<string, Array<[weight, prices]>>
