@@ -1,26 +1,26 @@
 {
   "gold": {
-      "0.1": {"harga_dasar":"321.500","harga_final":"321.500","harga_buyback":"241.000"},
-      "0.25": {"harga_dasar":"753.000","harga_final":"753.000","harga_buyback":"602.500"},
-      "0.5": {"harga_dasar":"1.321.000","harga_final":"1.321.000","harga_buyback":"1.205.000"},
-      "1": {"harga_dasar":"2.532.000","harga_final":"2.532.000","harga_buyback":"2.410.000"},
-      "2": {"harga_dasar":"5.024.000","harga_final":"5.024.000","harga_buyback":"4.820.000"},
-      "5": {"harga_dasar":"12.480.000","harga_final":"12.480.000","harga_buyback":"12.050.000"},
-      "10": {"harga_dasar":"24.910.000","harga_final":"24.910.000","harga_buyback":"24.100.000"},
-      "25": {"harga_dasar":"61.950.000","harga_final":"61.950.000","harga_buyback":"60.250.000"},
-      "50": {"harga_dasar":"123.850.000","harga_final":"123.850.000","harga_buyback":"120.500.000"},
-      "100": {"harga_dasar":"247.600.000","harga_final":"247.600.000","harga_buyback":"241.000.000"},
-      "125": {"harga_dasar":"309.125.000","harga_final":"309.125.000","harga_buyback":"298.625.000"},
-      "150": {"harga_dasar":"370.800.000","harga_final":"370.800.000","harga_buyback":"358.350.000"},
-      "175": {"harga_dasar":"432.425.000","harga_final":"432.425.000","harga_buyback":"418.075.000"},
-      "200": {"harga_dasar":"494.000.000","harga_final":"494.000.000","harga_buyback":"477.800.000"},
-      "250": {"harga_dasar":"617.000.000","harga_final":"617.000.000","harga_buyback":"595.250.000"},
-      "500": {"harga_dasar":"1.234.000.000","harga_final":"1.234.000.000","harga_buyback":"1.190.500.000"},
-      "1000": {"harga_dasar":"2.468.000.000","harga_final":"2.468.000.000","harga_buyback":"2.381.000.000"}
+      "0.1": {"harga_dasar":"315.500","harga_final":"315.500","harga_buyback":"236.100"},
+      "0.25": {"harga_dasar":"739.500","harga_final":"739.500","harga_buyback":"590.250"},
+      "0.5": {"harga_dasar":"1.295.500","harga_final":"1.295.500","harga_buyback":"1.180.500"},
+      "1": {"harga_dasar":"2.481.000","harga_final":"2.481.000","harga_buyback":"2.361.000"},
+      "2": {"harga_dasar":"4.922.000","harga_final":"4.922.000","harga_buyback":"4.722.000"},
+      "5": {"harga_dasar":"12.225.000","harga_final":"12.225.000","harga_buyback":"11.805.000"},
+      "10": {"harga_dasar":"24.400.000","harga_final":"24.400.000","harga_buyback":"23.610.000"},
+      "25": {"harga_dasar":"60.700.000","harga_final":"60.700.000","harga_buyback":"59.025.000"},
+      "50": {"harga_dasar":"121.350.000","harga_final":"121.350.000","harga_buyback":"118.050.000"},
+      "100": {"harga_dasar":"242.600.000","harga_final":"242.600.000","harga_buyback":"236.100.000"},
+      "125": {"harga_dasar":"302.750.000","harga_final":"302.750.000","harga_buyback":"290.375.000"},
+      "150": {"harga_dasar":"363.150.000","harga_final":"363.150.000","harga_buyback":"348.450.000"},
+      "175": {"harga_dasar":"423.500.000","harga_final":"423.500.000","harga_buyback":"406.525.000"},
+      "200": {"harga_dasar":"483.800.000","harga_final":"483.800.000","harga_buyback":"464.600.000"},
+      "250": {"harga_dasar":"604.250.000","harga_final":"604.250.000","harga_buyback":"576.875.000"},
+      "500": {"harga_dasar":"1.208.500.000","harga_final":"1.208.500.000","harga_buyback":"1.153.750.000"},
+      "1000": {"harga_dasar":"2.417.000.000","harga_final":"2.417.000.000","harga_buyback":"2.307.500.000"}
   },
   "prime": {
-      "25": {"harga_dasar":"62.525.000","harga_final":"62.525.000","harga_buyback":"60.250.000"},
-      "50": {"harga_dasar":"125.050.000","harga_final":"125.050.000","harga_buyback":"120.500.000"},
-      "100": {"harga_dasar":"250.100.000","harga_final":"250.100.000","harga_buyback":"241.000.000"}
+      "25": {"harga_dasar":"61.250.000","harga_final":"61.250.000","harga_buyback":"59.025.000"},
+      "50": {"harga_dasar":"122.500.000","harga_final":"122.500.000","harga_buyback":"118.050.000"},
+      "100": {"harga_dasar":"245.000.000","harga_final":"245.000.000","harga_buyback":"236.100.000"}
   }
 }
