@@ -6,18 +6,30 @@ const BUYBACK_URL = 'https://www.logammulia.com/id/sell/gold';
 const DENPASAR_CODE = 'ADPS';
 
 async function selectLocation(page) {
-  await page.evaluate(() => {
-    const link = Array.from(document.querySelectorAll('a[data-fancybox]')).find(
-      (a) => a.getAttribute('data-src')?.includes('change-location')
-    );
-    if (link) link.click();
+  const clicked = await page.evaluate(() => {
+    // The page also has a "change-location-chart" link (for a price chart widget)
+    // whose data-src also contains "change-location" — match exactly to avoid
+    // opening that popup instead, which has no #location select.
+    const link =
+      document.getElementById('btnChangeLocation2') ||
+      Array.from(document.querySelectorAll('a[data-fancybox]')).find(
+        (a) => a.getAttribute('data-src') === 'https://www.logammulia.com/change-location'
+      );
+    if (!link) return false;
+    link.click();
+    return true;
   });
+  if (!clicked) throw new Error('Change-location link not found on page');
   await page.waitForSelector('#location', { timeout: 90000 });
   await page.select('#location', DENPASAR_CODE);
+  // Click the real submit button rather than calling form.submit() directly —
+  // the site now runs JS on the button's click event that a programmatic
+  // form submit bypasses, which used to leave the request rejected server-side.
   await Promise.all([
-    page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }),
-    page.evaluate(() => document.getElementById('change-location').submit()),
+    page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }).catch(() => {}),
+    page.evaluate(() => document.getElementById('change-location-button').click()),
   ]);
+  await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
 }
 
 async function scrapeHargaEmas() {
@@ -33,7 +45,6 @@ async function scrapeHargaEmas() {
     await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
     await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
     await selectLocation(page);
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
     const buyHtml = await page.content();
     const buyData = parseTable(buyHtml);
 
