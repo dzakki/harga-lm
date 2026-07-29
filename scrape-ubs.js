@@ -10,11 +10,14 @@ const BUYBACK_URL = 'https://ubslifestyle.com/harga-buyback-hari-ini/';
 const CATEGORY = 'lm_ubs';
 
 async function scrapeAllPages() {
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
 
   await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   const entries = [];
@@ -78,7 +81,12 @@ function parseBuybackPage(html) {
     const cells = $(tr).find('td');
     if (cells.length < 3) return;
 
-    const raw = $(cells.eq(0)).text().trim().replace(/\s*gr(?:am)?\.?/i, '').replace(',', '.').trim();
+    const raw = $(cells.eq(0))
+      .text()
+      .trim()
+      .replace(/\s*gr(?:am)?\.?/i, '')
+      .replace(',', '.')
+      .trim();
     if (!raw || isNaN(parseFloat(raw))) return;
 
     const priceRaw = $(cells.eq(2)).text().replace(/[^\d]/g, '');
@@ -105,3 +113,4 @@ scrapeAllPages()
     console.error('Scrape failed:', err.message);
     process.exit(1);
   });
+

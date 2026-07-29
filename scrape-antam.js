@@ -13,7 +13,7 @@ async function selectLocation(page) {
     const link =
       document.getElementById('btnChangeLocation2') ||
       Array.from(document.querySelectorAll('a[data-fancybox]')).find(
-        (a) => a.getAttribute('data-src') === 'https://www.logammulia.com/change-location'
+        (a) => a.getAttribute('data-src') === 'https://www.logammulia.com/change-location',
       );
     if (!link) return false;
     link.click();
@@ -33,11 +33,14 @@ async function selectLocation(page) {
 }
 
 async function scrapeHargaEmas() {
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
 
   await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   try {
@@ -54,7 +57,7 @@ async function scrapeHargaEmas() {
     try {
       await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
       await page.waitForSelector('#valBasePrice', { timeout: 30000 });
-      pricePerGram = await page.$eval('#valBasePrice', el => parseFloat(el.value));
+      pricePerGram = await page.$eval('#valBasePrice', (el) => parseFloat(el.value));
       process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
     } catch (e) {
       process.stderr.write(`[antam] buyback scrape skipped: ${e.message}\n`);
@@ -85,26 +88,35 @@ function parseTable(html) {
   const result = new Map();
   let currentSection = null;
 
-  $('table.table-bordered').first().find('tbody tr').each((_, tr) => {
-    const sectionHeader = $(tr).find('th[colspan]');
-    if (sectionHeader.length) {
-      currentSection = toSnakeCase(sectionHeader.text());
-      if (!result.has(currentSection)) result.set(currentSection, []);
-      return;
-    }
+  $('table.table-bordered')
+    .first()
+    .find('tbody tr')
+    .each((_, tr) => {
+      const sectionHeader = $(tr).find('th[colspan]');
+      if (sectionHeader.length) {
+        currentSection = toSnakeCase(sectionHeader.text());
+        if (!result.has(currentSection)) result.set(currentSection, []);
+        return;
+      }
 
-    if (!currentSection) return;
+      if (!currentSection) return;
 
-    const cells = $(tr).find('td');
-    if (cells.length < 3) return;
+      const cells = $(tr).find('td');
+      if (cells.length < 3) return;
 
-    const berat = $(cells.eq(0)).text().trim().replace(/\s*gr$/i, '');
-    result.get(currentSection).push([berat, {
-      harga_dasar: $(cells.eq(1)).text().trim(),
-      harga_final: $(cells.eq(2)).text().trim(),
-      harga_buyback: null,
-    }]);
-  });
+      const berat = $(cells.eq(0))
+        .text()
+        .trim()
+        .replace(/\s*gr$/i, '');
+      result.get(currentSection).push([
+        berat,
+        {
+          harga_dasar: $(cells.eq(1)).text().trim(),
+          harga_final: $(cells.eq(2)).text().trim(),
+          harga_buyback: null,
+        },
+      ]);
+    });
 
   for (const [, entries] of result) {
     entries.sort(([a], [b]) => parseFloat(a) - parseFloat(b));
@@ -112,7 +124,6 @@ function parseTable(html) {
 
   return result;
 }
-
 
 function toJson(data) {
   // data is a Map<string, Array<[weight, prices]>>
@@ -130,3 +141,4 @@ scrapeHargaEmas()
     console.error('Scrape failed:', err.message);
     process.exit(1);
   });
+

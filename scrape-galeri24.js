@@ -5,11 +5,14 @@ const TARGET_URL = 'https://galeri24.co.id/harga-emas#GALERI%2024';
 const CATEGORY = 'galeri_24';
 
 async function scrapeHargaEmas() {
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
 
   await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   try {
@@ -37,24 +40,30 @@ function parseTable(html) {
     if ($(heading).text().trim().toUpperCase() !== 'HARGA GALERI 24') return;
 
     // Data rows are grid-cols-5 divs inside the sibling overflow container
-    $(heading).parent().find('.grid-cols-5').each((i, row) => {
-      // Skip the header row (col children are Berat / Harga Jual / Harga Buyback)
-      const cols = $(row).children('div');
-      if (cols.length < 3) return;
+    $(heading)
+      .parent()
+      .find('.grid-cols-5')
+      .each((i, row) => {
+        // Skip the header row (col children are Berat / Harga Jual / Harga Buyback)
+        const cols = $(row).children('div');
+        if (cols.length < 3) return;
 
-      const berat = $(cols.eq(0)).text().trim();
-      const hargaJual = stripRp($(cols.eq(1)).text().trim());
-      const hargaBuyback = cols.length >= 3 ? stripRp($(cols.eq(2)).text().trim()) : null;
+        const berat = $(cols.eq(0)).text().trim();
+        const hargaJual = stripRp($(cols.eq(1)).text().trim());
+        const hargaBuyback = cols.length >= 3 ? stripRp($(cols.eq(2)).text().trim()) : null;
 
-      // Skip the header row (non-numeric berat)
-      if (!berat || isNaN(parseFloat(berat))) return;
+        // Skip the header row (non-numeric berat)
+        if (!berat || isNaN(parseFloat(berat))) return;
 
-      entries.push([berat, {
-        harga_dasar: hargaJual,
-        harga_final: hargaJual,
-        harga_buyback: hargaBuyback || null,
-      }]);
-    });
+        entries.push([
+          berat,
+          {
+            harga_dasar: hargaJual,
+            harga_final: hargaJual,
+            harga_buyback: hargaBuyback || null,
+          },
+        ]);
+      });
   });
 
   // Sort numerically
@@ -75,3 +84,4 @@ scrapeHargaEmas()
     console.error('Scrape failed:', err.message);
     process.exit(1);
   });
+

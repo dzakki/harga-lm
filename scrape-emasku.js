@@ -4,11 +4,14 @@ const cheerio = require('cheerio');
 const TARGET_URL = 'https://www.emasku.co.id/id/gold-price';
 
 async function scrapeHargaEmas() {
-  const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
 
   await page.setUserAgent(
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   try {
@@ -53,15 +56,22 @@ function parseTable(html) {
     if (cells.length < 2) return;
 
     // Weight cell: "0.1 gr" — strip the " gr" suffix
-    const berat = $(cells.eq(0)).text().trim().replace(/\s*gr$/i, '').trim();
+    const berat = $(cells.eq(0))
+      .text()
+      .trim()
+      .replace(/\s*gr$/i, '')
+      .trim();
     const hargaDasar = parsePrice($(cells.eq(1)).text());
     const hargaBuyback = cells.length >= 3 ? parsePrice($(cells.eq(2)).text()) : null;
 
-    result.get(currentSection).push([berat, {
-      harga_dasar: hargaDasar,
-      harga_final: hargaDasar,
-      harga_buyback: hargaBuyback || null,
-    }]);
+    result.get(currentSection).push([
+      berat,
+      {
+        harga_dasar: hargaDasar,
+        harga_final: hargaDasar,
+        harga_buyback: hargaBuyback || null,
+      },
+    ]);
   });
 
   // Sort weights numerically within each category
@@ -86,3 +96,4 @@ scrapeHargaEmas()
     console.error('Scrape failed:', err.message);
     process.exit(1);
   });
+
