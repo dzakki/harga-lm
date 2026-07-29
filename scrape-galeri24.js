@@ -16,7 +16,7 @@ async function scrapeHargaEmas() {
   );
 
   try {
-    await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 180000 });
     // Wait for at least one section heading to be rendered
     await page.waitForSelector('.bg-primary-100', { timeout: 10000 });
 

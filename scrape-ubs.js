@@ -24,13 +24,13 @@ async function scrapeAllPages() {
 
   try {
     for (const url of BUY_PAGES) {
-      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 180000 });
       await page.waitForSelector('.as-producttile', { timeout: 10000 });
       entries.push(...parsePage(await page.content()));
     }
 
     // Scrape buyback prices
-    await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
     await page.waitForSelector('table tbody tr', { timeout: 15000 });
     const buybackMap = parseBuybackPage(await page.content());
 

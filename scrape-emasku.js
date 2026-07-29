@@ -15,7 +15,7 @@ async function scrapeHargaEmas() {
   );
 
   try {
-    await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(TARGET_URL, { waitUntil: 'networkidle2', timeout: 180000 });
     await page.waitForSelector('table tbody tr td', { timeout: 10000 });
 
     const html = await page.content();
