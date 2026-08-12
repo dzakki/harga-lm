@@ -20,16 +20,16 @@ async function selectLocation(page) {
     return true;
   });
   if (!clicked) throw new Error('Change-location link not found on page');
-  await page.waitForSelector('#location', { timeout: 90000 });
+  await page.waitForSelector('#location', { timeout: 180000 });
   await page.select('#location', DENPASAR_CODE);
   // Click the real submit button rather than calling form.submit() directly —
   // the site now runs JS on the button's click event that a programmatic
   // form submit bypasses, which used to leave the request rejected server-side.
   await Promise.all([
-    page.waitForNavigation({ waitUntil: 'load', timeout: 120000 }).catch(() => {}),
+    page.waitForNavigation({ waitUntil: 'load', timeout: 180000 }).catch(() => {}),
     page.evaluate(() => document.getElementById('change-location-button').click()),
   ]);
-  await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
+  await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 180000 });
 }
 
 async function scrapeHargaEmas() {
@@ -46,7 +46,7 @@ async function scrapeHargaEmas() {
   try {
     // --- Buy prices ---
     await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 90000 });
+    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 180000 });
     await selectLocation(page);
     const buyHtml = await page.content();
     const buyData = parseTable(buyHtml);
@@ -56,7 +56,7 @@ async function scrapeHargaEmas() {
     let pricePerGram = null;
     try {
       await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
-      await page.waitForSelector('#valBasePrice', { timeout: 30000 });
+      await page.waitForSelector('#valBasePrice', { timeout: 180000 });
       pricePerGram = await page.$eval('#valBasePrice', (el) => parseFloat(el.value));
       process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
     } catch (e) {
