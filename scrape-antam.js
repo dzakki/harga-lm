@@ -3,23 +3,17 @@ const cheerio = require('cheerio');
 
 const BUY_URL = 'https://www.logammulia.com/id/harga-emas-hari-ini';
 const BUYBACK_URL = 'https://www.logammulia.com/id/sell/gold';
+const CHANGE_LOCATION_URL = 'https://www.logammulia.com/id/change-location';
 const DENPASAR_CODE = 'ADPS';
 
 async function selectLocation(page) {
-  const clicked = await page.evaluate(() => {
-    // The page also has a "change-location-chart" link (for a price chart widget)
-    // whose data-src also contains "change-location" — match exactly to avoid
-    // opening that popup instead, which has no #location select.
-    const link =
-      document.getElementById('btnChangeLocation2') ||
-      Array.from(document.querySelectorAll('a[data-fancybox]')).find(
-        (a) => a.getAttribute('data-src') === 'https://www.logammulia.com/change-location',
-      );
-    if (!link) return false;
-    link.click();
-    return true;
-  });
-  if (!clicked) throw new Error('Change-location link not found on page');
+  // Previously this clicked the header's "Ubah Lokasi" link, which opens the
+  // change-location form via a fancybox AJAX request (data-src pointing at
+  // https://www.logammulia.com/change-location). The site's Cloudflare WAF now
+  // 403s that specific XHR (identifiable by the x-requested-with/sec-fetch-mode
+  // headers fancybox sends), even though the same URL loads fine as a plain
+  // page navigation — so navigate to the change-location page directly instead.
+  await page.goto(CHANGE_LOCATION_URL, { waitUntil: 'load', timeout: 180000 });
   await page.waitForSelector('#location', { timeout: 180000 });
   await page.select('#location', DENPASAR_CODE);
   // Click the real submit button rather than calling form.submit() directly —
@@ -29,6 +23,9 @@ async function selectLocation(page) {
     page.waitForNavigation({ waitUntil: 'load', timeout: 180000 }).catch(() => {}),
     page.evaluate(() => document.getElementById('change-location-button').click()),
   ]);
+  // Submitting lands back on the change-location page itself (it just sets a
+  // session cookie for the chosen location); reload the price page to see it reflected.
+  await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
   await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 180000 });
 }
 
@@ -45,22 +42,27 @@ async function scrapeHargaEmas() {
 
   try {
     // --- Buy prices ---
-    await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
-    await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 180000 });
+    // selectLocation navigates to the change-location page, switches to Denpasar,
+    // then loads BUY_URL itself so the table below reflects that location.
     await selectLocation(page);
     const buyHtml = await page.content();
     const buyData = parseTable(buyHtml);
 
     // --- Buyback prices ---
-    // logammulia.com/id/sell/gold shows a single per-gram rate that applies to all denominations
+    // logammulia.com/id/sell/gold shows a single per-gram rate that applies to all denominations.
+    // Cloudflare occasionally 403s this navigation when it lands right after the change-location
+    // + buy-price requests (flagged as bot-like rapid navigation) — a brief pause and retry clears it.
     let pricePerGram = null;
-    try {
-      await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
-      await page.waitForSelector('#valBasePrice', { timeout: 180000 });
-      pricePerGram = await page.$eval('#valBasePrice', (el) => parseFloat(el.value));
-      process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
-    } catch (e) {
-      process.stderr.write(`[antam] buyback scrape skipped: ${e.message}\n`);
+    for (let attempt = 1; attempt <= 3 && pricePerGram === null; attempt++) {
+      try {
+        if (attempt > 1) await new Promise((resolve) => setTimeout(resolve, 5000 * attempt));
+        await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
+        await page.waitForSelector('#valBasePrice', { timeout: 30000 });
+        pricePerGram = await page.$eval('#valBasePrice', (el) => parseFloat(el.value));
+        process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
+      } catch (e) {
+        process.stderr.write(`[antam] buyback scrape attempt ${attempt} failed: ${e.message}\n`);
+      }
     }
 
     // Multiply per-gram rate by weight for each entry across all categories
@@ -135,10 +137,27 @@ function toJson(data) {
   return '{\n' + categoryLines.join(',\n') + '\n}';
 }
 
-scrapeHargaEmas()
-  .then((data) => console.log(toJson(data)))
-  .catch((err) => {
-    console.error('Scrape failed:', err.message);
-    process.exit(1);
-  });
+async function main() {
+  // logammulia.com's Cloudflare protection occasionally blocks a request mid-flow
+  // (a 403 WAF page instead of the expected content) even when nothing about the
+  // page itself has changed — retrying the whole scrape with a fresh browser/session
+  // has been enough to clear it.
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const data = await scrapeHargaEmas();
+      console.log(toJson(data));
+      return;
+    } catch (err) {
+      process.stderr.write(`[antam] attempt ${attempt} failed: ${err.message}\n`);
+      if (attempt === maxAttempts) {
+        console.error('Scrape failed:', err.message);
+        process.exit(1);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10000 * attempt));
+    }
+  }
+}
+
+main();
 
