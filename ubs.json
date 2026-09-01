@@ -1,7 +1,7 @@
 {
   "lm_ubs": {
-      "0.1": {"harga_dasar":"344.600","harga_final":"344.600","harga_buyback":"230.000"},
-      "0.25": {"harga_dasar":"784.900","harga_final":"784.900","harga_buyback":"575.000"},
+      "0.1": {"harga_dasar":"343.500","harga_final":"343.500","harga_buyback":"230.000"},
+      "0.25": {"harga_dasar":"782.600","harga_final":"782.600","harga_buyback":"575.000"},
       "0.5": {"harga_dasar":"1.416.700","harga_final":"1.416.700","harga_buyback":"1.150.000"},
       "1": {"harga_dasar":"2.512.500","harga_final":"2.512.500","harga_buyback":"2.300.000"},
       "2": {"harga_dasar":"4.962.100","harga_final":"4.962.100","harga_buyback":"4.600.000"},
