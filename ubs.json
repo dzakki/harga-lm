@@ -2,15 +2,15 @@
   "lm_ubs": {
       "0.1": {"harga_dasar":"343.500","harga_final":"343.500","harga_buyback":"230.000"},
       "0.25": {"harga_dasar":"782.600","harga_final":"782.600","harga_buyback":"575.000"},
-      "0.5": {"harga_dasar":"1.416.700","harga_final":"1.416.700","harga_buyback":"1.150.000"},
-      "1": {"harga_dasar":"2.512.500","harga_final":"2.512.500","harga_buyback":"2.300.000"},
-      "2": {"harga_dasar":"4.962.100","harga_final":"4.962.100","harga_buyback":"4.600.000"},
-      "3": {"harga_dasar":"7.425.700","harga_final":"7.425.700","harga_buyback":"6.901.000"},
-      "4": {"harga_dasar":"9.864.700","harga_final":"9.864.700","harga_buyback":"9.201.000"},
-      "5": {"harga_dasar":"12.170.300","harga_final":"12.170.300","harga_buyback":"11.502.000"},
-      "10": {"harga_dasar":"24.128.700","harga_final":"24.128.700","harga_buyback":"23.004.000"},
-      "25": {"harga_dasar":"60.129.700","harga_final":"60.129.700","harga_buyback":"57.511.000"},
-      "50": {"harga_dasar":"119.840.500","harga_final":"119.840.500","harga_buyback":"115.022.000"},
-      "100": {"harga_dasar":"239.518.200","harga_final":"239.518.200","harga_buyback":"230.044.000"}
+      "0.5": {"harga_dasar":"1.412.500","harga_final":"1.412.500","harga_buyback":"1.150.000"},
+      "1": {"harga_dasar":"2.505.000","harga_final":"2.505.000","harga_buyback":"2.300.000"},
+      "2": {"harga_dasar":"4.947.200","harga_final":"4.947.200","harga_buyback":"4.600.000"},
+      "3": {"harga_dasar":"7.403.400","harga_final":"7.403.400","harga_buyback":"6.901.000"},
+      "4": {"harga_dasar":"9.835.000","harga_final":"9.835.000","harga_buyback":"9.201.000"},
+      "5": {"harga_dasar":"12.133.600","harga_final":"12.133.600","harga_buyback":"11.502.000"},
+      "10": {"harga_dasar":"24.056.100","harga_final":"24.056.100","harga_buyback":"23.004.000"},
+      "25": {"harga_dasar":"59.948.800","harga_final":"59.948.800","harga_buyback":"57.511.000"},
+      "50": {"harga_dasar":"119.480.000","harga_final":"119.480.000","harga_buyback":"115.022.000"},
+      "100": {"harga_dasar":"238.797.600","harga_final":"238.797.600","harga_buyback":"230.044.000"}
   }
 }
