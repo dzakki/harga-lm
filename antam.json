@@ -1,24 +1,24 @@
 {
   "emas_batangan": {
-      "0.5": {"harga_dasar":"1,350,000","harga_final":"1,353,375","harga_buyback":null},
-      "1": {"harga_dasar":"2,600,000","harga_final":"2,606,500","harga_buyback":null},
-      "2": {"harga_dasar":"5,140,000","harga_final":"5,152,850","harga_buyback":null},
-      "3": {"harga_dasar":"7,685,000","harga_final":"7,704,213","harga_buyback":null},
-      "5": {"harga_dasar":"12,775,000","harga_final":"12,806,938","harga_buyback":null},
-      "10": {"harga_dasar":"25,495,000","harga_final":"25,558,738","harga_buyback":null},
-      "25": {"harga_dasar":"63,612,000","harga_final":"63,771,030","harga_buyback":null},
-      "50": {"harga_dasar":"127,145,000","harga_final":"127,462,863","harga_buyback":null},
-      "100": {"harga_dasar":"254,212,000","harga_final":"254,847,530","harga_buyback":null},
-      "250": {"harga_dasar":"635,265,000","harga_final":"636,853,163","harga_buyback":null},
-      "500": {"harga_dasar":"1,270,320,000","harga_final":"1,273,495,800","harga_buyback":null},
-      "1000": {"harga_dasar":"2,540,600,000","harga_final":"2,546,951,500","harga_buyback":null}
+      "0.5": {"harga_dasar":"1,352,000","harga_final":"1,355,380","harga_buyback":null},
+      "1": {"harga_dasar":"2,604,000","harga_final":"2,610,510","harga_buyback":null},
+      "2": {"harga_dasar":"5,148,000","harga_final":"5,160,870","harga_buyback":null},
+      "3": {"harga_dasar":"7,697,000","harga_final":"7,716,243","harga_buyback":null},
+      "5": {"harga_dasar":"12,795,000","harga_final":"12,826,988","harga_buyback":null},
+      "10": {"harga_dasar":"25,535,000","harga_final":"25,598,838","harga_buyback":null},
+      "25": {"harga_dasar":"63,712,000","harga_final":"63,871,280","harga_buyback":null},
+      "50": {"harga_dasar":"127,345,000","harga_final":"127,663,363","harga_buyback":null},
+      "100": {"harga_dasar":"254,612,000","harga_final":"255,248,530","harga_buyback":null},
+      "250": {"harga_dasar":"636,265,000","harga_final":"637,855,663","harga_buyback":null},
+      "500": {"harga_dasar":"1,272,320,000","harga_final":"1,275,500,800","harga_buyback":null},
+      "1000": {"harga_dasar":"2,544,600,000","harga_final":"2,550,961,500","harga_buyback":null}
   },
   "emas_batangan_gift_series": {
-      "0.5": {"harga_dasar":"1,420,000","harga_final":"1,423,550","harga_buyback":null},
-      "1": {"harga_dasar":"2,750,000","harga_final":"2,756,875","harga_buyback":null}
+      "0.5": {"harga_dasar":"1,422,000","harga_final":"1,425,555","harga_buyback":null},
+      "1": {"harga_dasar":"2,754,000","harga_final":"2,760,885","harga_buyback":null}
   },
   "emas_batangan_batik_seri_iii": {
-      "10": {"harga_dasar":"26,500,000","harga_final":"26,566,250","harga_buyback":null},
-      "20": {"harga_dasar":"52,200,000","harga_final":"52,330,500","harga_buyback":null}
+      "10": {"harga_dasar":"26,540,000","harga_final":"26,606,350","harga_buyback":null},
+      "20": {"harga_dasar":"52,280,000","harga_final":"52,410,700","harga_buyback":null}
   }
 }
