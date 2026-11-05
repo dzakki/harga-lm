@@ -1,33 +1,90 @@
 const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
 
-const BUY_URL = 'https://www.logammulia.com/id/harga-emas-hari-ini';
-const BUYBACK_URL = 'https://www.logammulia.com/id/sell/gold';
-const CHANGE_LOCATION_URL = 'https://www.logammulia.com/id/change-location';
-const DENPASAR_CODE = 'ADPS';
+// logammulia.com was rebuilt as a Nuxt SPA. Its price APIs return encrypted
+// payloads, so we read the rendered DOM instead.
+const PRICE_URL = 'https://logammulia.com/harga-emas';
+const HOME_URL = 'https://logammulia.com/';
+const DENPASAR_BRANCH_CODE = '049'; // value of the "Butik Emas ANTAM Denpasar" radio in the "Pilih Butik" dialog
+// Only the regular bars — Gift Series, Batik, Imlek, Idul Fitri, etc. live in other sections.
+const REGULAR_SECTION_TITLE = 'Emas Batangan';
 
-async function selectLocation(page) {
-  // Previously this clicked the header's "Ubah Lokasi" link, which opens the
-  // change-location form via a fancybox AJAX request (data-src pointing at
-  // https://www.logammulia.com/change-location). The site's Cloudflare WAF now
-  // 403s that specific XHR (identifiable by the x-requested-with/sec-fetch-mode
-  // headers fancybox sends), even though the same URL loads fine as a plain
-  // page navigation — so navigate to the change-location page directly instead.
-  await page.goto(CHANGE_LOCATION_URL, { waitUntil: 'load', timeout: 180000 });
-  await page.waitForSelector('#location', { timeout: 180000 });
-  await page.select('#location', DENPASAR_CODE);
-  // Click the real submit button rather than calling form.submit() directly —
-  // the site now runs JS on the button's click event that a programmatic
-  // form submit bypasses, which used to leave the request rejected server-side.
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: 'load', timeout: 180000 }).catch(() => {}),
-    page.evaluate(() => document.getElementById('change-location-button').click()),
-  ]);
-  // Submitting lands back on the change-location page itself (it just sets a
-  // session cookie for the chosen location); reload the price page to see it reflected.
-  await page.goto(BUY_URL, { waitUntil: 'load', timeout: 180000 });
-  await page.waitForSelector('table.table-bordered tbody tr td', { timeout: 180000 });
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// The site pops a "Harga hari ini pada Butik yang Anda pilih belum tersedia" modal
+// on load that blocks clicks on the header; close any "OK" modal that is open.
+async function dismissOkDialogs(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll('.v-dialog--active button').forEach((b) => {
+      if (b.innerText.trim() === 'OK') b.click();
+    });
+  });
 }
+
+async function selectDenpasar(page) {
+  await page.goto(PRICE_URL, { waitUntil: 'networkidle2', timeout: 180000 });
+  await sleep(2000);
+  await dismissOkDialogs(page);
+  await sleep(1000);
+
+  // Open the "Lokasi Butik" picker in the header.
+  const opened = await page.evaluate(() => {
+    const el = [...document.querySelectorAll('header *, .secondary-nav *')].find(
+      (e) => e.children.length === 0 && (e.innerText || '').trim().startsWith('Butik Emas ANTAM'),
+    );
+    if (el) el.click();
+    return !!el;
+  });
+  if (!opened) throw new Error('Location picker not found');
+
+  const radio = `input[type=radio][value="${DENPASAR_BRANCH_CODE}"]`;
+  await page.waitForSelector(radio, { timeout: 30000 });
+  await page.evaluate((sel) => document.querySelector(sel).closest('label').click(), radio);
+  await sleep(500);
+  await page.evaluate(() => {
+    const btn = [...document.querySelectorAll('.v-dialog--active button')].find(
+      (b) => b.innerText.trim() === 'Pilih',
+    );
+    if (!btn) throw new Error('"Pilih" button not found');
+    btn.click();
+  });
+
+  await page.waitForFunction(
+    () => (document.querySelector('header')?.innerText || '').includes('Butik Emas ANTAM Denpasar'),
+    { timeout: 30000 },
+  );
+  await page.waitForNetworkIdle({ idleTime: 1500, timeout: 60000 }).catch(() => {});
+  await sleep(1000);
+  await dismissOkDialogs(page);
+}
+
+// Reads the "Emas Batangan" price list (the first section under "Emas & Perak").
+async function readRegularPrices(page) {
+  return page.evaluate((title) => {
+    const titleEl = [...document.querySelectorAll('div.font-weight-bold')].find(
+      (d) => d.children.length === 0 && d.innerText.trim() === title,
+    );
+    if (!titleEl) return null;
+    // Section wrapper is the closest ".py-6" block containing both title and rows.
+    const section = titleEl.closest('.py-6');
+    const rows = [...section.querySelectorAll('.d-flex.align-center.border-bottom-grey-2')];
+    return rows.map((row) => {
+      const cells = [...row.children].filter((c) => c.tagName === 'DIV').map((c) => c.innerText.trim());
+      return cells;
+    });
+  }, REGULAR_SECTION_TITLE);
+}
+
+// Homepage "Harga Hari Ini" card: "Harga Jual Emas  Rp 2,357,000/gr".
+async function readBuybackPerGram(page) {
+  await page.goto(HOME_URL, { waitUntil: 'networkidle2', timeout: 180000 });
+  const text = await page.evaluate(() => document.body.innerText);
+  const m = text.match(/Harga Jual Emas\s+Rp\s*([\d.,]+)\s*\/\s*gr/i);
+  if (!m) throw new Error('Buyback price not found on homepage');
+  return parseInt(m[1].replace(/[^\d]/g, ''), 10);
+}
+
+const cleanRp = (s) => s.replace(/^Rp\s*/i, '').trim();
+const formatNumber = (n) => Math.round(n).toLocaleString('en-US');
 
 async function scrapeHargaEmas() {
   const browser = await puppeteer.launch({
@@ -35,96 +92,50 @@ async function scrapeHargaEmas() {
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
   });
   const page = await browser.newPage();
-
+  await page.setViewport({ width: 1400, height: 900 });
   await page.setUserAgent(
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
   );
 
   try {
-    // --- Buy prices ---
-    // selectLocation navigates to the change-location page, switches to Denpasar,
-    // then loads BUY_URL itself so the table below reflects that location.
-    await selectLocation(page);
-    const buyHtml = await page.content();
-    const buyData = parseTable(buyHtml);
+    await selectDenpasar(page);
+    const rows = await readRegularPrices(page);
+    if (!rows || rows.length === 0) throw new Error('Emas Batangan price table not found');
 
-    // --- Buyback prices ---
-    // logammulia.com/id/sell/gold shows a single per-gram rate that applies to all denominations.
-    // Cloudflare occasionally 403s this navigation when it lands right after the change-location
-    // + buy-price requests (flagged as bot-like rapid navigation) — a brief pause and retry clears it.
+    const entries = rows
+      .filter((cells) => cells.length >= 3 && /gr$/i.test(cells[0]))
+      .map((cells) => [
+        cells[0].replace(/\s*gr$/i, '').trim(),
+        {
+          harga_dasar: cleanRp(cells[1]),
+          harga_final: cleanRp(cells[cells.length - 1]),
+          harga_buyback: null,
+        },
+      ]);
+    if (entries.length === 0) throw new Error('Emas Batangan table had no rows');
+
+    // The buyback rate is a single per-gram price that applies to all denominations.
     let pricePerGram = null;
     for (let attempt = 1; attempt <= 3 && pricePerGram === null; attempt++) {
       try {
-        if (attempt > 1) await new Promise((resolve) => setTimeout(resolve, 5000 * attempt));
-        await page.goto(BUYBACK_URL, { waitUntil: 'networkidle2', timeout: 180000 });
-        await page.waitForSelector('#valBasePrice', { timeout: 30000 });
-        pricePerGram = await page.$eval('#valBasePrice', (el) => parseFloat(el.value));
+        if (attempt > 1) await sleep(5000 * attempt);
+        pricePerGram = await readBuybackPerGram(page);
         process.stderr.write(`[antam] buyback per gram: ${pricePerGram}\n`);
       } catch (e) {
         process.stderr.write(`[antam] buyback scrape attempt ${attempt} failed: ${e.message}\n`);
       }
     }
-
-    // Multiply per-gram rate by weight for each entry across all categories
-    for (const [, entries] of buyData) {
+    if (pricePerGram !== null) {
       for (const [weight, prices] of entries) {
-        if (pricePerGram !== null) {
-          const total = pricePerGram * parseFloat(weight);
-          prices.harga_buyback = Math.round(total).toLocaleString('id-ID');
-        }
+        prices.harga_buyback = formatNumber(pricePerGram * parseFloat(weight));
       }
     }
 
-    return buyData;
+    entries.sort(([a], [b]) => parseFloat(a) - parseFloat(b));
+    return new Map([['emas_batangan', entries]]);
   } finally {
     await browser.close();
   }
-}
-
-function toSnakeCase(str) {
-  return str.trim().toLowerCase().replace(/\s+/g, '_');
-}
-
-function parseTable(html) {
-  const $ = cheerio.load(html);
-  const result = new Map();
-  let currentSection = null;
-
-  $('table.table-bordered')
-    .first()
-    .find('tbody tr')
-    .each((_, tr) => {
-      const sectionHeader = $(tr).find('th[colspan]');
-      if (sectionHeader.length) {
-        currentSection = toSnakeCase(sectionHeader.text());
-        if (!result.has(currentSection)) result.set(currentSection, []);
-        return;
-      }
-
-      if (!currentSection) return;
-
-      const cells = $(tr).find('td');
-      if (cells.length < 3) return;
-
-      const berat = $(cells.eq(0))
-        .text()
-        .trim()
-        .replace(/\s*gr$/i, '');
-      result.get(currentSection).push([
-        berat,
-        {
-          harga_dasar: $(cells.eq(1)).text().trim(),
-          harga_final: $(cells.eq(2)).text().trim(),
-          harga_buyback: null,
-        },
-      ]);
-    });
-
-  for (const [, entries] of result) {
-    entries.sort(([a], [b]) => parseFloat(a) - parseFloat(b));
-  }
-
-  return result;
 }
 
 function toJson(data) {
@@ -138,10 +149,8 @@ function toJson(data) {
 }
 
 async function main() {
-  // logammulia.com's Cloudflare protection occasionally blocks a request mid-flow
-  // (a 403 WAF page instead of the expected content) even when nothing about the
-  // page itself has changed — retrying the whole scrape with a fresh browser/session
-  // has been enough to clear it.
+  // logammulia.com's Cloudflare protection occasionally blocks a request mid-flow;
+  // retrying the whole scrape with a fresh browser/session has been enough to clear it.
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -154,10 +163,9 @@ async function main() {
         console.error('Scrape failed:', err.message);
         process.exit(1);
       }
-      await new Promise((resolve) => setTimeout(resolve, 10000 * attempt));
+      await sleep(10000 * attempt);
     }
   }
 }
 
 main();
-
