@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
-const TARGET_URL = 'https://www.emasku.co.id/id/gold-price';
+const TARGET_URL = 'https://hrtagold.id/id/gold-price';
 
 async function scrapeHargaEmas() {
   const browser = await puppeteer.launch({
