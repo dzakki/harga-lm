@@ -1,9 +1,9 @@
 {
   "lm_ubs": {
-      "0.1": {"harga_dasar":"332.400","harga_final":"332.400","harga_buyback":"223.000"},
-      "0.25": {"harga_dasar":"756.700","harga_final":"756.700","harga_buyback":"559.000"},
-      "0.5": {"harga_dasar":"1.364.600","harga_final":"1.364.600","harga_buyback":"1.119.000"},
-      "1": {"harga_dasar":"2.417.600","harga_final":"2.417.600","harga_buyback":"2.239.000"},
+      "0.1": {"harga_dasar":"331.600","harga_final":"331.600","harga_buyback":"223.000"},
+      "0.25": {"harga_dasar":"755.000","harga_final":"755.000","harga_buyback":"559.000"},
+      "0.5": {"harga_dasar":"1.361.600","harga_final":"1.361.600","harga_buyback":"1.119.000"},
+      "1": {"harga_dasar":"2.412.200","harga_final":"2.412.200","harga_buyback":"2.239.000"},
       "2": {"harga_dasar":"4.763.500","harga_final":"4.763.500","harga_buyback":"4.478.000"},
       "3": {"harga_dasar":"7.128.300","harga_final":"7.128.300","harga_buyback":"6.717.000"},
       "4": {"harga_dasar":"9.469.200","harga_final":"9.469.200","harga_buyback":"8.956.000"},
